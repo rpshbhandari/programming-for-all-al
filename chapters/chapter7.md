@@ -1,222 +1,97 @@
 # Chapter 7: Creating and Managing Tables
 
+## Objectives
+
+By the end of this chapter you will be able to:
+
+- ✅ Design a table with reliable keys and field constraints
+- ✅ Use `TableRelation`, `NotBlank`, and validation triggers correctly
+- ✅ Apply trigger logic that protects data integrity without blocking valid updates
+- ✅ Prepare a table structure that later chapters can build on safely
+
 ## 7.1 Defining Tables in AL
 
-In AL, tables are defined to store and manage data. Each table consists of fields that hold specific pieces of information.
-
-### Example Table Definition
+Tables hold your extension's source of truth. A good table design enforces rules close to the data, not only in UI code.
 
 ```al
-table 50100 Customer
+table 50100 "Loan Repayment Schedule"
 {
-    DataClassification = ToBeClassified;
+    DataClassification = CustomerContent;
 
     fields
     {
-        field(1; "No."; Code[20])
-        {
-            DataClassification = CustomerContent;
-        }
-        field(2; Name; Text[100])
-        {
-            DataClassification = CustomerContent;
-        }
-        field(3; Address; Text[100])
-        {
-            DataClassification = ToBeClassified;
-        }
-        field(4; "Phone No."; Text[30])
-        {
-            DataClassification = ToBeClassified;
-        }
+        field(1; "Loan No."; Code[20]) { DataClassification = CustomerContent; }
+        field(2; "Installment No."; Integer) { DataClassification = CustomerContent; }
+        field(3; "Due Date"; Date) { DataClassification = CustomerContent; }
+        field(4; "Principal Amount"; Decimal) { DataClassification = CustomerContent; }
+        field(5; "Interest Amount"; Decimal) { DataClassification = CustomerContent; }
+        field(6; "Total Amount"; Decimal) { DataClassification = CustomerContent; }
+        field(7; Paid; Boolean) { DataClassification = CustomerContent; }
     }
 
     keys
     {
-        key(PK; "No.")
-        {
-            Clustered = true;
-        }
+        key(PK; "Loan No.", "Installment No.") { Clustered = true; }
     }
 }
 ```
 
-## 7.2 Primary Keys and Indexes
+## 7.2 Keys and Indexing Strategy
 
-Primary keys uniquely identify records in a table. Indexes improve data retrieval performance.
+Use a primary key that reflects uniqueness of business meaning. In this case, one installment number is unique only within a loan, so a composite key is appropriate.
 
-### Defining Primary Keys
+Add secondary keys only for real query paths. Extra keys speed reads but slow writes.
 
-The primary key is defined in the `keys` section of the table definition.
+## 7.3 Field Properties and Validation
 
-```al
-keys
-{
-    key(PK; "No.")
-    {
-        Clustered = true;
-    }
-}
-```
+Use field properties to move obvious rules out of procedural code:
 
-### Defining Secondary Indexes
+- `NotBlank = true` where empty values are invalid
+- `TableRelation` for foreign-key style lookups
+- `MinValue` where negative values are impossible
 
-Secondary indexes can be defined to optimize queries on non-primary key fields.
+This reduces duplicated checks in pages and codeunits.
 
-```al
-keys
-{
-    key(PK; "No.")
-    {
-        Clustered = true;
-    }
-    key(Name; Name)
-    {
-        Clustered = false;
-    }
-}
-```
+## 7.4 Triggers for Data Integrity
 
-## 7.3 Field Data Types and Properties
-
-AL supports various field data types. Each field can have properties that define its behavior and constraints.
-
-### Common Data Types
-
-- `Code[Length]`: Fixed-length alphanumeric code.
-- `Text[Length]`: Variable-length text.
-- `Integer`: Integer number.
-- `Decimal`: Decimal number.
-- `Date`: Date value.
-- `Boolean`: Boolean value (true/false).
-
-### Field Properties
-
-- `DataClassification`: Defines the classification of the data for compliance purposes.
-- `NotBlank`: Ensures the field cannot be empty.
-- `TableRelation`: Defines a relationship to another table.
-
-### Example with Properties
-
-```al
-field(1; "No."; Code[20])
-{
-    DataClassification = CustomerContent;
-    NotBlank = true;
-}
-field(3; "Salesperson Code"; Code[10])
-{
-    TableRelation = Salesperson;
-}
-```
-
-## 7.4 Relationships Between Tables
-
-Relationships between tables are defined using the `TableRelation` property. This ensures referential integrity and allows for data lookups.
-
-### Defining Table Relations
-
-```al
-field(2; "Customer No."; Code[20])
-{
-    TableRelation = Customer."No.";
-}
-```
-
-## 7.5 Table Triggers
-Table triggers in AL are special methods that automatically execute code at certain events during the lifecycle of a table record, such as when records are inserted, modified, or deleted.
-
-### OnInsert Trigger
-Executes code when a new record is inserted into the table. 
+Keep trigger logic minimal and deterministic.
 
 ```al
 trigger OnInsert()
 begin
-    // if the record is created without No then it auto assigns
-    if "No." = '' then begin
-            SalesSetup.Get();
-            SalesSetup.TestField("Customer Nos.");
-            NoSeriesMgt.InitSeries(SalesSetup."Customer Nos.", xRec."No. Series", 0D, "No.", "No. Series");
-        end;
+    "Total Amount" := "Principal Amount" + "Interest Amount";
 end;
 
-```
-
-### OnModify Trigger
-Executes code when an existing record is modified.
-
-```al
 trigger OnModify()
-    begin
-        Error('No modification allowed')
-    end;
-```
-
-### OnDelete Trigger
-Executes code when a record is deleted from the table.
-
-```al
-trigger OnDelete()
 begin
-    // Code to execute when a record is deleted
-    Error('Delete not allowed')
+    if xRec.Paid then
+        Error('A paid installment cannot be changed.');
+    "Total Amount" := "Principal Amount" + "Interest Amount";
 end;
 ```
 
-### OnRename Trigger
-Executes code when a record's primary key is changed.
+Use `xRec` when checking prior state; using `Rec` here would block valid state transitions (covered deeply in Chapter 9).
 
-```al
-trigger OnRename()
-begin
-    // Code to execute when a record is renamed
-    Message('A customer record has been renamed.');
-end;
-```
+## 7.5 Table Design Practices
 
+- Keep derived values consistent (`Total Amount` from principal + interest).
+- Avoid side effects that belong in codeunits.
+- Align field classification and permissions with Chapters 11 and 15.
 
-## 7.6 Best Practices for Table Design
+## Chapter Summary
 
-- **Normalization**: Organize tables to reduce redundancy and dependency.
-- **Naming Conventions**: Use clear and consistent naming conventions for tables and fields.
-- **Data Integrity**: Define relationships and use field properties to ensure data integrity.
-- **Performance**: Use indexes to optimize data retrieval and consider the impact on insert/update performance.
+- ✅ You designed a table with business-correct keys
+- ✅ You used properties and relations to enforce integrity
+- ✅ You implemented trigger logic with correct `Rec`/`xRec` semantics
+- ✅ You established a table foundation for page and codeunit work
 
-### Example of Best Practices
+---
 
-```al
-table 50101 Order
-{
-    DataClassification = ToBeClassified;
+## Tasks
 
-    fields
-    {
-        field(1; "Order No."; Code[20])
-        {
-            DataClassification = OrderContent;
-            NotBlank = true;
-        }
-        field(2; "Customer No."; Code[20])
-        {
-            DataClassification = CustomerContent;
-            TableRelation = Customer."No.";
-        }
-        field(3; "Order Date"; Date)
-        {
-            DataClassification = ToBeClassified;
-        }
-    }
+1. **Create the table.** Implement `Loan Repayment Schedule` with composite key and core fields.
+2. **Add constraints.** Apply `TableRelation`, `NotBlank`, and value guards where needed.
+3. **Harden triggers.** Ensure `OnModify` checks `xRec.Paid` before allowing edits.
+4. **Try it yourself.** Add one additional field and justify its `DataClassification`.
 
-    keys
-    {
-        key(PK; "Order No.")
-        {
-            Clustered = true;
-        }
-        key(Customer; "Customer No.")
-        {
-            Clustered = false;
-        }
-    }
-}
-```
+**Check your work:** Chapter 9's codeunit and Chapter 14's tests should run against this table design without trigger-related regressions.

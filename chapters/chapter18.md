@@ -1,30 +1,69 @@
 # Chapter 18: Contributing to the AL Community
-## 18.1 Participating in Open Source Projects
-Contribute to open-source projects to improve the AL ecosystem. Collaborate with other developers to create shared solutions and libraries.
 
-Steps:
+## Objectives
 
-1. Find Projects: Explore repositories on platforms like GitHub. Example:
-    - [Microsoft Dynamics 365 Business Central - Application Platform](https://github.com/RupeshBhandari/BusinessCentralApps)
-    - [BCApps](https://github.com/microsoft/BCApps)
-2. Contribute: Submit pull requests, report issues, and suggest enhancements.
-3. Collaborate: Engage with project maintainers and other contributors.
+By the end of this chapter you will be able to:
 
-Note:
-Don't simply change a typo and create a pull requests. Show your programming prowess rather than your gramatical skills.
+- ✅ Contribute meaningful improvements to AL repositories
+- ✅ Write contribution artifacts that are technically useful, not just cosmetic
+- ✅ Collaborate effectively through issues, pull requests, and review feedback
+- ✅ Evaluate contribution quality with clear standards
 
-## 18.2 Writing Documentation and Tutorials
-Share your knowledge by writing documentation and tutorials in [Microsoft Dynamics 365 Business Central documentation](https://learn.microsoft.com/en-us/dynamics365/business-central/). Help others learn AL and contribute to the community's growth.
+## 18.1 Contributing to Open Source AL Projects
 
-### Tips:
-- Clear Writing: Write clear and concise explanations.
-- Examples: Include code examples and step-by-step guides.
-- Engage Readers: Encourage feedback and interaction from readers.
+High-value contributions usually include:
 
-## 18.3 Engaging with the Microsoft Dynamics Community
-Engage with the Microsoft Dynamics community through forums, social media, and events. Share your experiences, ask questions, and learn from others.
+- bug fixes with reproducible steps,
+- tests that prevent regressions,
+- performance or security improvements,
+- documentation updates tied to code behavior.
 
-Steps:
-- Join Forums: Participate in forums like [Dynamics Community](https://community.dynamics.com/).
-- Attend Events: Join conferences, webinars, and meetups.
-- Network: Connect with other developers, consultants, and users.
+Examples:
+
+- [Microsoft Dynamics 365 Business Central - Application Platform](https://github.com/RupeshBhandari/BusinessCentralApps)
+- [BCApps](https://github.com/microsoft/BCApps)
+
+## 18.2 Pull Request Quality Standards
+
+A strong contribution should include:
+
+1. **Problem statement**: what was wrong and why it matters.
+2. **Change summary**: what was modified and where.
+3. **Validation evidence**: tests, repro output, or before/after behavior.
+4. **Risk notes**: known limitations or follow-up tasks.
+
+Avoid low-impact PRs that only fix isolated spelling issues without technical value.
+
+## 18.3 Writing Helpful Documentation and Tutorials
+
+Documentation should help a developer execute, not just read:
+
+- Use runnable examples.
+- Explain assumptions and prerequisites.
+- Link related chapters or objects so readers understand context.
+
+For this repository, strong chapter updates mirror the structure used in Chapters 9, 11, and 16.
+
+## 18.4 Community Collaboration Habits
+
+- Open clear issues before large design changes.
+- Respond to review feedback with evidence, not opinion.
+- Keep discussions respectful and solution-oriented.
+
+## Chapter Summary
+
+- ✅ You learned how to create technically meaningful AL contributions
+- ✅ You applied concrete PR quality criteria
+- ✅ You practiced documentation patterns that support implementation
+- ✅ You aligned contribution habits with maintainable community collaboration
+
+---
+
+## Tasks
+
+1. **Contribution assessment.** Review one AL PR and score it against the four quality standards in 18.2.
+2. **Improvement proposal.** Draft a high-value issue that includes reproducible steps and expected behavior.
+3. **Documentation task.** Update one technical section so another contributor can execute it without extra context.
+4. **Try it yourself.** Write one paragraph explaining why test evidence is more persuasive than screenshots alone.
+
+**Check your work:** your contribution checklist should be specific enough to evaluate the chapter tasks and solution artifacts in this repository.
