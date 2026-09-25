@@ -56,11 +56,11 @@ Use this quick flow whenever you're unsure which type to pick:
 ```mermaid
 flowchart TD
     A[What kind of value?] --> B{Identifier with fixed pattern?}
-    B -->|Yes| C[Use Code[n]]
+    B -->|Yes| C["Use Code[n]"]
     B -->|No| D{Money or rate?}
     D -->|Yes| E[Use Decimal]
     D -->|No| F{Free-form human text?}
-    F -->|Yes| G[Use Text[n]]
+    F -->|Yes| G["Use Text[n]"]
     F -->|No| H{Date only or date+time?}
     H -->|Date only| I[Use Date]
     H -->|Date + time| J[Use DateTime]
