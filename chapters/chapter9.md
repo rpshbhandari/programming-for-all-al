@@ -171,6 +171,5 @@ These tasks continue the `Loan Repayment Schedule` example from Chapter 7.
    would happen if someone ran it twice for the same loan? Add whatever
    guard you think is needed.
 
-**Check your work:** compare your codeunit against the reference
-solution in `/solutions/chapter9/LoanRepaymentMgt.Codeunit.al` in this
+**Check your work:** compare your codeunit against the [reference solution]({{ '/solutions/chapter9/LoanRepaymentMgt.Codeunit.al' | relative_url }}) in this
 repo.
