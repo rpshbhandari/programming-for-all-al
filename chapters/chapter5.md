@@ -43,6 +43,21 @@ Long expressions are correct only if future readers can audit them quickly.
 
 These choices make Chapter 13 performance and Chapter 14 testing much easier.
 
+## 5.4 Expression Evaluation Flow (Visual Guide)
+
+Use this as a reminder of evaluation order and validation gates:
+
+```mermaid
+flowchart TD
+    A[Read inputs] --> B{Quantity > 0?}
+    B -->|No| C[Error: invalid quantity]
+    B -->|Yes| D{UnitPrice >= 0?}
+    D -->|No| E[Error: invalid unit price]
+    D -->|Yes| F[Gross = Quantity * UnitPrice]
+    F --> G[”Discounted = Gross * (1 - DiscountPct)”]
+    G --> H[Return line total]
+```
+
 ## Chapter Summary
 
 - ✅ You used arithmetic, comparison, and logical operators in realistic AL scenarios
@@ -53,8 +68,11 @@ These choices make Chapter 13 performance and Chapter 14 testing much easier.
 
 ## Tasks
 
-1. **Formula extraction.** Replace one long inline expression with named local variables.
-2. **Condition hardening.** Rewrite one multi-condition `if` with explicit parentheses.
-3. **Try it yourself.** Add one validation expression that rejects invalid installment input.
+1. **Operator warmup.** Write one AL example each for arithmetic, comparison, and logical operators using loan-installment values.
+2. **Formula extraction.** Replace one long inline expression with named local variables (`GrossAmount`, `DiscountAmount`, `NetAmount`).
+3. **Precedence check.** Evaluate the same formula once without parentheses and once with parentheses; explain the difference.
+4. **Condition hardening.** Rewrite one multi-condition `if` with explicit parentheses and positive naming (`IsDue`, `HasAmount`, etc.).
+5. **Validation expression.** Add one expression that rejects invalid installment input (`Amount <= 0`, missing date, or invalid status combination).
+6. **Try it yourself.** Create a boolean expression for "ready to post" that uses at least three conditions and document why each is needed.
 
-**Check your work:** your expressions should be easy to reuse in Chapter 7 triggers and Chapter 9 codeunit procedures.
+**Check your work:** compare your answers with `/solutions/chapter5/TASKS.md`, then ensure your expressions remain reusable in Chapter 7 triggers and Chapter 9 codeunit procedures.
