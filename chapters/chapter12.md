@@ -1,56 +1,91 @@
 # Chapter 12: Integration with Other Systems
-## 12.1 Using Web Services
-Web services allow you to expose Business Central data and operations to external systems. AL supports both SOAP and OData web services.
 
-Example:
+## Objectives
+
+By the end of this chapter you will be able to:
+
+- ✅ Expose controlled extension functionality through service-enabled procedures
+- ✅ Call external APIs with `HttpClient` and robust status handling
+- ✅ Parse and validate integration payloads before data changes
+- ✅ Apply integration guardrails that align with security and reliability practices
+
+## 12.1 Exposing AL Procedures as Services
+
+Service-enabled procedures can expose extension functionality to external callers.
 
 ```al
-codeunit 50100 CustomerWebService
+codeunit 50120 "Loan Integration API"
 {
     [ServiceEnabled]
-    procedure GetCustomer(var Customer: Record Customer)
+    procedure GetInstallmentStatus(LoanNo: Code[20]; InstallmentNo: Integer): Text
+    var
+        Installment: Record "Loan Repayment Schedule";
     begin
-        // Code to fetch customer data
+        if not Installment.Get(LoanNo, InstallmentNo) then
+            Error('Installment %1/%2 was not found.', LoanNo, InstallmentNo);
+
+        if Installment.Paid then
+            exit('Paid');
+
+        exit('Open');
     end;
 }
 ```
 
-## 12.2 Integrating with External APIs
-AL can interact with external APIs using HTTP requests. This allows seamless integration with other applications and services.
+Return stable, simple values that external systems can depend on.
 
-Example:
+## 12.2 Calling External APIs Safely
 
 ```al
-procedure CallExternalAPI()
+procedure GetCreditRiskScore(VendorNo: Code[20]): Decimal
 var
-    HttpClient: HttpClient;
-    HttpResponseMessage: HttpResponseMessage;
-    JsonResponse: Text;
+    Client: HttpClient;
+    Response: HttpResponseMessage;
+    Content: Text;
 begin
-    HttpClient.Get('https://api.example.com/data', HttpResponseMessage);
-    if HttpResponseMessage.IsSuccessStatusCode then begin
-        HttpResponseMessage.Content.ReadAs(JsonResponse);
-        Message('Response: %1', JsonResponse);
-    end else
-        Error('Failed to call API');
+    Client.Get(StrSubstNo('https://api.example.com/vendors/%1/risk', VendorNo), Response);
+
+    if not Response.IsSuccessStatusCode then
+        Error('Risk API call failed with status %1.', Response.HttpStatusCode);
+
+    Response.Content.ReadAs(Content);
+    exit(EvaluateRiskScore(Content));
 end;
 ```
 
-### 12.3 Data Exchange and Interoperability
-Data exchange features in Business Central include XMLports and Data Exchange Definitions, enabling import/export of data in various formats.
+Avoid showing raw API responses to end users. Convert remote errors into clear domain messages.
 
-Example:
+## 12.3 Payload Validation and Idempotency
 
-```al
-xmlport 50100 CustomerImport
-{
-    Schema
-    {
-        // Define XML schema for import
-    }
-    trigger OnAfterInsertRecord()
-    begin
-        // Code to process imported data
-    end;
-}
-```
+Before writing external data to Business Central:
+
+- Validate required keys and value formats.
+- Reject unknown or unsupported status values.
+- Prevent duplicate inserts for the same external transaction key.
+
+These checks protect consistency and are test targets in Chapter 14.
+
+## 12.4 Integration Design Practices
+
+- Keep networking code in dedicated integration codeunits.
+- Separate parsing/validation from persistence logic.
+- Log enough context for support without leaking sensitive data.
+- Align permissions and classifications with Chapters 11 and 15.
+
+## Chapter Summary
+
+- ✅ You exposed controlled AL service operations
+- ✅ You handled outbound HTTP calls with explicit failure handling
+- ✅ You validated external payloads before mutating data
+- ✅ You applied durable integration design patterns for production use
+
+---
+
+## Tasks
+
+1. **Service endpoint.** Create one service-enabled procedure that returns installment status.
+2. **HTTP robustness.** Implement one outbound API call that checks `IsSuccessStatusCode` and handles failures.
+3. **Validation gate.** Add payload validation that rejects missing or invalid required values.
+4. **Try it yourself.** Define how you would prevent the same external transaction from being imported twice.
+
+**Check your work:** your integration flow should still honor table constraints from Chapter 7 and business-logic boundaries from Chapter 9.

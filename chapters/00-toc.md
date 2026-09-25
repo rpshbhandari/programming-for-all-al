@@ -37,6 +37,6 @@
 
 ### Part VI: Appendices
 
-A. [AL Syntax Reference](appendix-a.md)
-B. [Troubleshooting and FAQs](appendix-b.md)
-C. [Resources and Further Reading](appendix-c.md)
+A. [AL Syntax Reference](appendixa.md)
+B. [Troubleshooting and FAQs](appendixb.md)
+C. [Resources and Further Reading](appendixc.md)

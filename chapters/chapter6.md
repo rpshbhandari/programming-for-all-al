@@ -1,103 +1,86 @@
 # Chapter 6: Control Structures
-## 6.1 Conditional Statements
-Conditional statements control the flow of execution based on boolean expressions:
 
-- If statements execute code blocks based on conditions.
-- Case statements evaluate an expression against multiple values.
+## Objectives
 
-Example:
+By the end of this chapter you will be able to:
+
+- ✅ Use `if`, `case`, and loops appropriately in AL
+- ✅ Choose between `for`, `while`, and `repeat..until` based on intent
+- ✅ Apply safe error handling patterns for business rules
+- ✅ Write control flow that scales to real data volumes
+
+## 6.1 Conditional Statements (`if` and `case`)
+
+Use `if` for binary or short decision trees. Use `case` for multiple discrete branches.
+
 ```al
-// if else
-var
-    score: Integer;
-begin
-    score := 85;
-    if score >= 90 then
-        Message('Grade: A')
-    else if score >= 80 then
-        Message('Grade: B')
+if Score >= 90 then
+    Grade := 'A'
+else
+    if Score >= 80 then
+        Grade := 'B'
     else
-        Message('Grade: C');
-end;
-
-// case
-var
-    score: Integer;
-begin
-    score := 85;
-    case score of  
-        1,2,9:  
-            message('1, 2, or 9.');  
-        10..100:  
-            message('In the range from 10 to 100.');  
-    else  
-        message('Neither 1, 2, 9, nor in the range from 10 to 100.');  
-end;
+        Grade := 'C';
 ```
 
-Note:
-When you use a case statement, indent the value sets by four character spaces. If you've two or more value sets on the same line, then separate them by commas without spaces. The last value set on a line is immediately followed by a colon without a preceding space. The action starts on the line after the value set and is further indented by four character spaces. If there's a begin, then it should be put on a separate line unless it follows else. If a begin follows an else, then it should be on the same line as else. If there are more than two alternatives, use a case statement. Otherwise, use an if-then-else statement ([AL control statements](https://learn.microsoft.com/en-us/dynamics365/business-central/dev-itpro/developer/devenv-al-control-statements)).
-
+```al
+case DocumentStatus of
+    DocumentStatus::Open:
+        HandleOpen();
+    DocumentStatus::Released:
+        HandleReleased();
+else
+    Error('Unsupported status: %1', Format(DocumentStatus));
+end;
+```
 
 ## 6.2 Looping Constructs
-Loops allow repeated execution of code blocks:
 
-- For loop iterates a specific number of times.
-- While loop continues while a condition is true.
-- Repeat-Until loop executes until a condition is true.
+Use the loop type that matches business behavior:
 
-Example:
+- `for`: known iteration count (for example, fixed installments)
+- `while`: condition-driven iteration
+- `repeat..until`: record traversal after `FindSet`
+
 ```al
-// For loop
-var
-    i: Integer;
-begin
-    for i := 1 to 10 do begin
-        Message('Iteration: %1', i);
-    end;
-end;
-
-// while loop
-var
-    i: Integer;
-begin
-    while I < 1000 do begin
-        I := I + 1;  
-        message(format(I));
-    end;
-end;
-
-// repeat until
-var
-    Count : Integer;
-    Customer : Record Customer;  
-begin
-    if Customer.FindSet(true) then begin  
-        repeat  
-            if Customer.Name2 = '' then begin
-                Customer.Name2 = Customer.Name;
-                Customer.Modify();
-            end;
-        until Customer.Next() = 0;  
-    end;
-end;
+if Customer.FindSet() then
+    repeat
+        ProcessCustomer(Customer);
+    until Customer.Next() = 0;
 ```
+
+This pattern is heavily used in Chapters 9 and 13.
 
 ## 6.3 Error Handling and Assertions
-Error handling ensures your program can handle unexpected situations gracefully:
 
-AssertError triggers an error when a condition fails.
-Error raises an error with a custom message.  
-Example:
+Use `Error` to stop invalid transactions early.
 
 ```al
-var
-    divisor: Integer;
-begin
-    divisor := 0;
-    if divisor = 0 then
-        Error('Division by zero is not allowed.');
-end;
-
+if Amount <= 0 then
+    Error('Amount must be greater than zero.');
 ```
 
+In tests (Chapter 14), use assertions to prove behavior, rather than manual UI checks.
+
+## 6.4 Control-Flow Quality Guidelines
+
+- Keep nested depth low; extract helper procedures.
+- Fail fast on invalid data.
+- Never use loops when a filtered set would do (see Chapter 13).
+
+## Chapter Summary
+
+- ✅ You applied AL conditionals and loops with clear selection criteria
+- ✅ You used repeatable record-iteration patterns
+- ✅ You added safe, explicit error handling in business rules
+- ✅ You prepared control-flow techniques reused in codeunits and tests
+
+---
+
+## Tasks
+
+1. **Branching choice.** Replace one overgrown `if` chain with a `case` where appropriate.
+2. **Loop correction.** Refactor one loop to use `FindSet` + `repeat..until` for records.
+3. **Guard clause.** Add one fail-fast `Error` that protects invalid input.
+
+**Check your work:** your loop and branching style should align with Chapters 9, 13, and 14 patterns.
