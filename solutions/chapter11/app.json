@@ -1,0 +1,15 @@
+{
+  "id": "5fe684dd-ff76-4e98-aad2-2b9294550110",
+  "name": "Loan Repayment Management",
+  "publisher": "Programming for All",
+  "version": "1.0.0.0",
+  "brief": "Track loan installments and repayment status.",
+  "idRanges": [
+    {
+      "from": 50100,
+      "to": 50149
+    }
+  ],
+  "dependencies": [],
+  "runtime": "12.0"
+}
