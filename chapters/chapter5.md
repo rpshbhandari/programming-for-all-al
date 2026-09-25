@@ -54,7 +54,7 @@ flowchart TD
     B -->|Yes| D{UnitPrice >= 0?}
     D -->|No| E[Error: invalid unit price]
     D -->|Yes| F[Gross = Quantity * UnitPrice]
-    F --> G[Discounted = Gross * (1 - DiscountPct)]
+    F --> G[”Discounted = Gross * (1 - DiscountPct)”]
     G --> H[Return line total]
 ```
 
